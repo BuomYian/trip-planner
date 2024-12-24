@@ -1,13 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SelectBudgetOptions, SelectTravelList } from "@/constants/options";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  AI_PROMPT,
+  SelectBudgetOptions,
+  SelectTravelList,
+} from "@/constants/options";
+import { chatSession } from "@/service/AiModal";
 import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 
 const CreateTrip = () => {
   const [place, setPlace] = useState();
-
+  const { toast } = useToast();
   const [formData, setFormData] = useState([]);
 
   const handleInputChange = (name, value) => {
@@ -18,17 +23,37 @@ const CreateTrip = () => {
     console.log(formData);
   }, [formData]);
 
-  const onGeneratedTrip = () => {
-    if (formData.noOfDays > 5) {
-      toast("Please enter a valid number of days");
+  const onGeneratedTrip = async () => {
+    if (
+      !formData.noOfDays ||
+      !formData.location ||
+      !formData.budget ||
+      !formData.travelers
+    ) {
+      toast({
+        title: "Error",
+        description: "Please enter all the details",
+        variant: "destructive",
+      });
       return;
     }
 
-    console.log("Generated Trip", formData);
+    const FINAL_PROMPT = AI_PROMPT.replace(
+      `{location}`,
+      formData.location.label
+    )
+      .replace(`{noOfDays}`, formData.noOfDays)
+      .replace(`{travelers}`, formData.travelers)
+      .replace(`{budget}`, formData.budget)
+      .replace(`{noOfdays}`, formData.noOfDays);
+
+    console.log(FINAL_PROMPT);
+    const result = await chatSession.sendMessage(FINAL_PROMPT);
+    console.log(result.response.text());
   };
 
   return (
-    <div className="sm:px-10 md:px-10 lg:px-15 xl:px-40 px-8 mt-5 py-6">
+    <div className="sm:px-10 md:px-10 lg:px-20 xl:px-20 px-8 mt-5 py-6">
       <h2 className="text-3xl font-bold">Tell us your preferences</h2>
       <p className="text-gray-500 mt-3 text-xl">
         Just tell some basic information about your trip and we&apos;ll create a
@@ -81,18 +106,16 @@ const CreateTrip = () => {
 
         <div>
           <h2 className="text-2xl my-3 font-medium">
-            Whom are you tavelling with?
+            Whom are you travelling with?
           </h2>
           <div className="grid grid-cols-3 md:grid-cols-3 sm:grid-cols-2 gap-5 mt-3">
             {SelectTravelList.map((item, index) => (
               <div
                 key={index}
                 className={`p-4 border rounded-lg hover:shadow-lg cursor-pointer ${
-                  formData.noOfTravellers === item.people
-                    ? "border-[#f56551]"
-                    : ""
+                  formData.travelers === item.people ? "border-[#f56551]" : ""
                 }`}
-                onClick={() => handleInputChange("noOfTravellers", item.people)}
+                onClick={() => handleInputChange("travelers", item.people)}
               >
                 <h2 className="text-4xl">{item.icon}</h2>
                 <h2 className="font-bold text-lg">{item.title}</h2>
