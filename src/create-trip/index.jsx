@@ -22,6 +22,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { ref, set } from "firebase/database";
 import { db } from "@/service/FirebaseConfig";
+import { useNavigate } from "react-router-dom";
 
 const CreateTrip = () => {
   const [place, setPlace] = useState();
@@ -29,6 +30,8 @@ const CreateTrip = () => {
   const [formData, setFormData] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleInputChange = (name, value) => {
     setFormData({ ...formData, [name]: value });
@@ -91,7 +94,7 @@ const CreateTrip = () => {
       const userInfo = JSON.parse(localStorage.getItem("user"));
       const docId = Date.now().toString();
 
-      await set(ref(db, 'AITrips/' + docId), {
+      await set(ref(db, "AITrips/" + docId), {
         userSelection: formData,
         tripData: JSON.parse(TripData),
         userEmail: userInfo?.email,
@@ -103,6 +106,7 @@ const CreateTrip = () => {
         description: "Trip saved successfully!",
       });
       setLoading(false);
+      navigate(`/view-trip/${docId}`);
     } catch (error) {
       console.error("Error saving trip:", error);
       toast({
