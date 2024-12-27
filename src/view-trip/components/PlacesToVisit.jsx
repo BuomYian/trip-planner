@@ -1,3 +1,8 @@
+// import { Button } from "@/components/ui/button";
+// import { FaLocationDot } from "react-icons/fa6";
+
+import { Link } from "react-router-dom";
+
 const PlacesToVisit = (trip) => {
   if (!trip?.trip?.tripData?.itinerary) {
     return null;
@@ -14,7 +19,7 @@ const PlacesToVisit = (trip) => {
   return (
     <div className="mt-8">
       <h2 className="font-bold text-2xl mb-4">Places to Visit</h2>
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {itineraryDays.map((dayData, index) => (
           <div className="p-4" key={index}>
             <h3 className="font-semibold text-xl mb-3 text-primary">
@@ -29,33 +34,48 @@ const PlacesToVisit = (trip) => {
                   className="border-l-4 border-primary py-2"
                   key={placeIndex}
                 >
-                  <div className="my-2 bg-gray-50 p-2 gap-4 border rounded-lg flex flex-cols-2 hover:scale-105 transition-all hover:shadow-md cursor-pointer">
-                    {place.placeImageUrl && (
-                      <img
-                        src={place.placeImageUrl}
-                        alt={place.placeName}
-                        className="w-32 h-32 object-cover rounded-lg ml-4"
-                      />
-                    )}
-                    <div>
-                      <h4 className="font-bold text-lg">{place.placeName}</h4>
-                      <p className="text-sm text-gray-500 mt-1">
-                        {place.placeDetails}
-                      </p>
-                      <div className="mt-2 text-sm text-gray-500">
-                        <p>Travel Time: {place.travelTime}</p>
-                        <p className="text-blue-700 text-sm">
-                          Entry Fee:{" "}
-                          {place.ticketPricing === "Free"
-                            ? "Free Entry"
-                            : `$${place.ticketPricing}`}
+                  <Link
+                    to={
+                      "https://www.google.com/maps/search/?api=1&query=" +
+                      place?.placeName +
+                      "," +
+                      place?.geoCoordinates
+                    }
+                    target="_blank"
+                    className="text-gray-800 hover:text-gray-800"
+                  >
+                    <div className="my-2 bg-gray-50 p-2 gap-4 border rounded-lg flex flex-cols-2 hover:scale-105 transition-all hover:shadow-md cursor-pointer">
+                      {place.placeImageUrl && (
+                        <img
+                          src="/public/lisbon.jpg"
+                          alt={place.placeName}
+                          className="w-32 h-32 object-cover rounded-lg ml-4"
+                        />
+                      )}
+                      <div>
+                        <h4 className="font-bold text-lg">{place.placeName}</h4>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {place.placeDetails}
                         </p>
-                        <p className="text-sm text-yellow-500">
-                          Rating: {place.rating} ⭐
-                        </p>
+                        <div className="mt-2 text-sm text-gray-600">
+                          <p>Travel Time: {place.travelTime}</p>
+                          <p className="text-blue-700 text-sm">
+                            Entry Fee:{" "}
+                            {place.ticketPricing === "Free"
+                              ? "Free Entry"
+                              : `$${place.ticketPricing}`}
+                          </p>
+                          <p className="text-sm text-yellow-500">
+                            Rating: {place.rating} ⭐
+                          </p>
+                        </div>
+
+                        {/* <Button>
+                        <FaLocationDot className="w-4 h-4" />
+                      </Button> */}
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
               ))}
             </div>
