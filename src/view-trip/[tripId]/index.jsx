@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import InfoSection from "../components/InfoSection";
 import Hotels from "../components/Hotels";
+import PlacesToVisit from "../components/PlacesToVisit";
 
 const ViewTrip = () => {
   const { tripId } = useParams();
@@ -60,7 +61,7 @@ const ViewTrip = () => {
   }
 
   return (
-    <div className="p-10 md:px-20 lg:px-56">
+    <div className="p-4 md:px-20 lg:px-56">
       {/* Information Section */}
       <InfoSection trip={tripData} />
 
@@ -68,6 +69,7 @@ const ViewTrip = () => {
       <Hotels trip={tripData} />
 
       {/* Daily Plan */}
+      <PlacesToVisit trip={tripData} />
 
       {/* Footer */}
     </div>

@@ -26,10 +26,8 @@ const Hotels = (trip) => {
                 <h2 className="text-xs text-gray-500">
                   📍 {hotel?.hotelAddress}
                 </h2>
-                <h2 className="text-xs text-gray-700">Price: {hotel?.price}</h2>
-                <h2 className="text-xs text-gray-700">
-                  Rating: {hotel?.rating}
-                </h2>
+                <h2 className="text-xs text-gray-700">💰 {hotel?.price}</h2>
+                <h2 className="text-xs text-gray-700">⭐ {hotel?.rating}</h2>
               </div>
             </div>
           </Link>
