@@ -27,29 +27,65 @@ import { useNavigate } from "react-router-dom";
 const CreateTrip = () => {
   const [place, setPlace] = useState();
   const { toast } = useToast();
-  const [formData, setFormData] = useState([]);
+  const [formData, setFormData] = useState({});
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
 
   const handleInputChange = (name, value) => {
     setFormData({ ...formData, [name]: value });
+    // Clear error when field is filled
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: null });
+    }
   };
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.location) {
+      newErrors.location = 'Please select a destination';
+    }
+    
+    if (!formData.noOfDays) {
+      newErrors.noOfDays = 'Please enter number of days';
+    } else if (formData.noOfDays <= 0) {
+      newErrors.noOfDays = 'Number of days must be greater than 0';
+    }
+    
+    if (!formData.budget) {
+      newErrors.budget = 'Please select your budget';
+    }
+    
+    if (!formData.travelers) {
+      newErrors.travelers = 'Please select who you are traveling with';
+    }
 
-  const login = useGoogleLogin({
-    onSuccess: (userRes) => getUserProfile(userRes),
-    onError: (error) => {
-      console.log(error);
-    },
-  });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const onGeneratedTrip = async () => {
     const user = localStorage.getItem("user");
+
+    if (!user) {
+      setOpenDialog(true);
+      return;
+    }
+
+    if (!validateForm()) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all required fields",
+      });
+      return;
+    }
+
+    setLoading(true);
+    //const user = localStorage.getItem("user");
 
     if (!user) {
       setOpenDialog(true);
@@ -137,6 +173,17 @@ const CreateTrip = () => {
       });
   };
 
+  useEffect(() => {
+    console.log(formData);
+  }, [formData]);
+
+  const login = useGoogleLogin({
+    onSuccess: (userRes) => getUserProfile(userRes),
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   return (
     <div className="sm:px-10 md:px-10 lg:px-20 xl:px-20 px-8 mt-5 py-6">
       <h2 className="text-3xl font-bold">Tell us your preferences</h2>
@@ -157,8 +204,13 @@ const CreateTrip = () => {
                 setPlace(v);
                 handleInputChange("location", v);
               },
+              placeholder: "Enter your destination",
+              className: errors.location ? "border-red-500" : "",
             }}
           />
+          {errors.location && (
+            <p className="text-red-500 text-sm mt-1">{errors.location}</p>
+          )}
         </div>
         <div>
           <h2 className="text-2xl my-3 font-medium">
@@ -167,8 +219,13 @@ const CreateTrip = () => {
           <Input
             placeholder="Enter number of days"
             type="number"
+            min="1"
             onChange={(e) => handleInputChange("noOfDays", e.target.value)}
+            className={errors.noOfDays ? "border-red-500" : ""}
           />
+          {errors.noOfDays && (
+            <p className="text-red-500 text-sm mt-1">{errors.noOfDays}</p>
+          )}
         </div>
         <div>
           <h2 className="text-2xl my-3 font-medium">What is your budget?</h2>
@@ -178,7 +235,7 @@ const CreateTrip = () => {
                 key={index}
                 className={`p-4 border rounded-lg hover:shadow-lg cursor-pointer ${
                   formData.budget === item.title ? "border-[#f56551]" : ""
-                }`}
+                } ${errors.budget ? "border-red-500" : ""}`}
                 onClick={() => handleInputChange("budget", item.title)}
               >
                 <h2 className="text-4xl">{item.icon}</h2>
@@ -187,6 +244,9 @@ const CreateTrip = () => {
               </div>
             ))}
           </div>
+          {errors.budget && (
+            <p className="text-red-500 text-sm mt-1">{errors.budget}</p>
+          )}
         </div>
 
         <div>
@@ -199,7 +259,7 @@ const CreateTrip = () => {
                 key={index}
                 className={`p-4 border rounded-lg hover:shadow-lg cursor-pointer ${
                   formData.travelers === item.people ? "border-[#f56551]" : ""
-                }`}
+                } ${errors.travelers ? "border-red-500" : ""}`}
                 onClick={() => handleInputChange("travelers", item.people)}
               >
                 <h2 className="text-4xl">{item.icon}</h2>
@@ -208,6 +268,9 @@ const CreateTrip = () => {
               </div>
             ))}
           </div>
+          {errors.travelers && (
+            <p className="text-red-500 text-sm mt-1">{errors.travelers}</p>
+          )}
         </div>
       </div>
       <div className="flex justify-end">
@@ -225,18 +288,21 @@ const CreateTrip = () => {
         </Button>
       </div>
 
-      <Dialog open={openDialog}>
-        <DialogContent>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="font-bold text-lg mt-7">
               Sign in with Google
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="flex flex-col items-center gap-4">
               To generate a trip, you need to sign in with your google account
               <Button
                 disabled={loading}
-                onClick={login}
-                className="bg-[#f56551] text-white font-bold py-2 px-5 rounded-lg mt-10"
+                onClick={() => {
+                  setLoading(true);
+                  login();
+                }}
+                className="bg-[#f56551] text-white font-bold py-2 px-5 rounded-lg flex items-center gap-2"
               >
                 <FcGoogle className="text-2xl" />
                 Sign in With Google

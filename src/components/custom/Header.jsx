@@ -54,7 +54,7 @@ const Header = () => {
   return (
     <div className="p-8 shadow-sm flex justify-between items-center w-full">
       <a href="/">
-        <h2 className="font-bold text-2xl cursor-pointer text-gray-600">
+        <h2 className="font-bold text-2xl cursor-pointer text-gray-800">
           Ai Trip Planner
         </h2>
       </a>
@@ -67,25 +67,36 @@ const Header = () => {
               </Button>
             </a>
 
-            <Popover className="">
+            <Popover>
               <PopoverTrigger>
                 <img
                   src={user?.picture}
                   alt={user.name}
-                  className="w-10 h-10 rounded-full ml-4"
+                  className="w-10 h-10 rounded-full ml-4 cursor-pointer hover:opacity-80 transition-opacity"
                 />
               </PopoverTrigger>
-              <PopoverContent>
-                <h2
+              <PopoverContent className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg">
+                <div className="flex items-center gap-3 p-2">
+                  <img
+                    src={user?.picture}
+                    alt={user.name}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <div>
+                    <p className="font-medium text-gray-800">{user.name}</p>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                  </div>
+                </div>
+                <div
                   onClick={() => {
                     googleLogout();
-                    localStorage.clear();
+                    localStorage.removeItem("user");
                     window.location.reload();
                   }}
-                  className="cursor-pointer"
+                  className="mt-2 p-2 text-red-600 hover:bg-red-50 rounded-md cursor-pointer transition-colors"
                 >
-                  Logout
-                </h2>
+                  Sign Out
+                </div>
               </PopoverContent>
             </Popover>
           </div>
@@ -99,18 +110,21 @@ const Header = () => {
         )}
       </div>
 
-      <Dialog open={openDialog}>
-        <DialogContent>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="font-bold text-lg mt-7">
               Sign in with Google
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="flex flex-col items-center gap-4">
               To generate a trip, you need to sign in with your google account
               <Button
                 disabled={loading}
-                onClick={login}
-                className="bg-[#f56551] text-white font-bold py-2 px-5 rounded-lg mt-10"
+                onClick={() => {
+                  setLoading(true);
+                  login();
+                }}
+                className="bg-[#f56551] text-white font-bold py-2 px-5 rounded-lg flex items-center gap-2"
               >
                 <FcGoogle className="text-2xl" />
                 Sign in With Google
