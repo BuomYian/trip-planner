@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "../ui/button";
 import {
   Popover,
@@ -21,9 +21,9 @@ const Header = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    console.log("User:", user);
-  }, []);
+  // useEffect(() => {
+  //   console.log("User:", user);
+  // }, []);
 
   const login = useGoogleLogin({
     onSuccess: (userRes) => getUserProfile(userRes),
@@ -31,6 +31,12 @@ const Header = () => {
       console.log(error);
     },
   });
+
+  const onSignOut = () => {
+    googleLogout();
+    localStorage.removeItem("user");
+    window.location.reload();
+  };
 
   const getUserProfile = (tokenInfo) => {
     axios
@@ -44,7 +50,7 @@ const Header = () => {
         }
       )
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         localStorage.setItem("user", JSON.stringify(res.data));
         setOpenDialog(false);
         window.location.reload();
@@ -54,51 +60,62 @@ const Header = () => {
   return (
     <div className="p-8 shadow-sm flex justify-between items-center w-full">
       <a href="/">
-        <h2 className="font-bold text-2xl cursor-pointer text-gray-800">
+        <h2 className="font-bold text-lg sm:text-2xl cursor-pointer text-gray-800">
           Ai Trip Planner
         </h2>
       </a>
       <div>
         {user ? (
           <div className="flex items-center gap-3">
+            <a href="/create-trip">
+              <Button
+                varient="outline"
+                className="bg-[#f56551] text-white font-bold py-2 px-5 rounded-lg"
+                size="sm"
+              >
+                Create Trip
+              </Button>
+            </a>
             <a href="/my-trips">
-              <Button className="bg-[#f56551] text-white font-bold py-2 px-5 rounded-lg">
+              <Button
+                varient="outline"
+                className="bg-[#f56551] text-white font-bold py-2 px-5 rounded-lg"
+                size="sm"
+              >
                 My Trip
               </Button>
             </a>
 
-            <Popover>
-              <PopoverTrigger>
-                <img
-                  src={user?.picture}
-                  alt={user.name}
-                  className="w-10 h-10 rounded-full ml-4 cursor-pointer hover:opacity-80 transition-opacity"
-                />
-              </PopoverTrigger>
-              <PopoverContent className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg">
-                <div className="flex items-center gap-3 p-2">
+            <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center">
+              <Popover>
+                <PopoverTrigger>
                   <img
                     src={user?.picture}
                     alt={user.name}
-                    className="w-8 h-8 rounded-full"
+                    className="w-10 h-10 rounded-full ml-4 cursor-pointer hover:opacity-80 transition-opacity"
                   />
-                  <div>
-                    <p className="font-medium text-gray-800">{user.name}</p>
-                    <p className="text-sm text-gray-500">{user.email}</p>
+                </PopoverTrigger>
+                <PopoverContent className="bg-white/95 backdrop-blur-sm border border-gray-200 shadow-lg">
+                  <div className="flex items-center gap-3 p-2">
+                    <img
+                      src={user?.picture}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <div>
+                      <p className="font-medium text-gray-800">{user.name}</p>
+                      <p className="text-sm text-gray-500">{user.email}</p>
+                    </div>
                   </div>
-                </div>
-                <div
-                  onClick={() => {
-                    googleLogout();
-                    localStorage.removeItem("user");
-                    window.location.reload();
-                  }}
-                  className="mt-2 p-2 text-red-600 hover:bg-red-50 rounded-md cursor-pointer transition-colors"
-                >
-                  Sign Out
-                </div>
-              </PopoverContent>
-            </Popover>
+                  <div
+                    onClick={onSignOut}
+                    className="mt-2 p-2 text-red-600 hover:bg-red-50 rounded-md cursor-pointer transition-colors"
+                  >
+                    Sign Out
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
         ) : (
           <Button

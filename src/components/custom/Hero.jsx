@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
-    <div className="flex flex-col items-center mt-16 mx-5 px-10 gap-9">
+    <div className="flex flex-col items-center justify-center mt-16 mx-5 px-10 gap-9">
       <h1 className="text-[55px] font-bold text-center">
         <span className="text-[#f56551]">
           Discover your next adventure with AI:
@@ -20,6 +20,12 @@ const Hero = () => {
           Get Started
         </Button>
       </Link>
+
+      {/* <img
+        src="/hero.jpg"
+        alt="hero"
+        className="w-[75%] md:w-full h-[950px] -mt-35"
+      /> */}
     </div>
   );
 };

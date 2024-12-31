@@ -19,24 +19,29 @@ const MyTrip = () => {
   const getPlacePhoto = async (location, tripId) => {
     try {
       const response = await axios.post(
-        'https://places.googleapis.com/v1/places:searchText',
+        "https://places.googleapis.com/v1/places:searchText",
         {
-          textQuery: location
+          textQuery: location,
         },
         {
           headers: {
-            'Content-Type': 'application/json',
-            'X-Goog-Api-Key': import.meta.env.VITE_GOOGLE_PLACE_API_KEY,
-            'X-Goog-FieldMask': 'places.photos'
-          }
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": import.meta.env.VITE_GOOGLE_PLACE_API_KEY,
+            "X-Goog-FieldMask": "places.photos",
+          },
         }
       );
 
       const places = response.data.places;
-      if (places && places.length > 0 && places[0].photos && places[0].photos.length > 0) {
-        setPlacePhotos(prev => ({
+      if (
+        places &&
+        places.length > 0 &&
+        places[0].photos &&
+        places[0].photos.length > 0
+      ) {
+        setPlacePhotos((prev) => ({
           ...prev,
-          [tripId]: places[0].photos[0].name
+          [tripId]: places[0].photos[0].name,
         }));
       }
     } catch (error) {
@@ -107,12 +112,16 @@ const MyTrip = () => {
               onClick={() => navigate(`/view-trip/${trip.id}`)}
             >
               <h2 className="font-semibold text-xl mb-2">
-                {trip.userSelection?.location?.label || 'Unnamed Location'}
+                {trip.userSelection?.location?.label || "Unnamed Location"}
               </h2>
               <div>
                 {placePhotos[trip.id] ? (
                   <img
-                    src={`https://places.googleapis.com/v1/${placePhotos[trip.id]}/media?key=${import.meta.env.VITE_GOOGLE_PLACE_API_KEY}&maxHeightPx=400&maxWidthPx=800`}
+                    src={`https://places.googleapis.com/v1/${
+                      placePhotos[trip.id]
+                    }/media?key=${
+                      import.meta.env.VITE_GOOGLE_PLACE_API_KEY
+                    }&maxHeightPx=400&maxWidthPx=800`}
                     alt={trip.userSelection?.location?.label}
                     className="w-full h-48 object-cover rounded-lg mb-2"
                   />
@@ -124,12 +133,13 @@ const MyTrip = () => {
                   />
                 )}
                 <div className="text-sm text-gray-600 space-y-1">
-                  <p>Duration: {trip.userSelection?.noOfDays || 'N/A'} Days</p>
-                  <p>Budget: ${trip.userSelection?.budget || 'N/A'}</p>
-                  <p>Travelers: {trip.userSelection?.travelers || 'N/A'}</p>
+                  <p>Duration: {trip.userSelection?.noOfDays || "N/A"} Days</p>
+                  <p>Budget: {trip.userSelection?.budget || "N/A"}</p>
+                  <p>Travelers: {trip.userSelection?.travelers || "N/A"}</p>
                 </div>
                 <div className="mt-4 text-sm text-gray-500">
-                  Created on: {new Date(trip.timestamp || Date.now()).toLocaleDateString()}
+                  Created on:{" "}
+                  {new Date(trip.timestamp || Date.now()).toLocaleDateString()}
                 </div>
               </div>
             </div>
